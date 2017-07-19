@@ -17,6 +17,7 @@ namespace CouchDbApplication
             //BusinessService bs = new BusinessService();
             //bs.DeleteDatabase();
             byte[] data;
+            List<string> values = new List<string>();
             Console.WriteLine("Müşteri Yönetim Paneline Hoşgeldiniz... Rahatla dostummm bende :)");
             Console.WriteLine("-----------------------------------------------------------------");
             while (true)
@@ -35,16 +36,34 @@ namespace CouchDbApplication
                 switch (selection)
                 {
                     case "1":
+                        values.Clear();
                         Console.Write("\n");
                         Business busines = new Business();
-                        List<string> values = new List<string>();
                         for (int i = 0; i < specificProperties.Length; i++)
                         {
-                            Console.Write(specificProperties[i].CustomAttributes.Where(x => x.AttributeType.Name == "DisplayNameAttribute").FirstOrDefault().ConstructorArguments[0].Value + ": ");
+                            Console.Write(specificProperties[i].CustomAttributes.Where(x => x.AttributeType.Name == "DisplayNameAttribute").FirstOrDefault().ConstructorArguments[0].Value + "(Çıkmak için [E]): ");
                             string variable = Console.ReadLine();
-                            if (variable != null & variable != "")
+                            if (variable.ToUpper() == "E")
+                            {
+                                break;
+                            }
+                            else if (variable != null & variable != "")
                             {
                                 values.Add(variable);
+                                if (i == specificProperties.Length - 1)
+                                {
+                                    busines.Id = values[0];
+                                    busines.Name = values[1];
+                                    busines.Surname = values[2];
+                                    busines.Department = values[3];
+                                    busines.Birthdate = values[4];
+                                    busines.Phone = values[5];
+                                    busines.City = values[6];
+                                    busines.Country = values[7];
+                                    businessService.InsertBusinessman(busines);
+                                    Console.WriteLine("Müşteri kaydı başarıyla yapıldı.Devam etmek için [ENTER] tuşuna basınız...");
+                                    Console.ReadLine();
+                                }
                             }
                             else
                             {
@@ -52,17 +71,6 @@ namespace CouchDbApplication
                                 continue;
                             }
                         }
-                        busines.Id = values[0];
-                        busines.Name = values[1];
-                        busines.Surname = values[2];
-                        busines.Department = values[3];
-                        busines.Birthdate = values[4];
-                        busines.Phone = values[5];
-                        busines.City = values[6];
-                        busines.Country = values[7];
-                        businessService.InsertBusinessman(busines);
-                        Console.WriteLine("Müşteri kaydı başarıyla yapıldı.Devam etmek için [ENTER] tuşuna basınız...");
-                        Console.ReadLine();
                         break;
                     case "2":
                         Console.Write("\n");
@@ -71,44 +79,52 @@ namespace CouchDbApplication
                         if (businessId != null & businessId != "")
                         {
                             Business updatingBusiness = businessService.GetById(businessId);
-                            Console.WriteLine("Güncellenmek istenen müşteri bilgileri");
-                            Console.WriteLine("--------------------------------------");
-                            Console.WriteLine("    Id: " + updatingBusiness.Id);
-                            Console.WriteLine("(1) Ad: " + updatingBusiness.Name);
-                            Console.WriteLine("(2) Soyad: " + updatingBusiness.Surname);
-                            Console.WriteLine("(3) Bölüm: " + updatingBusiness.Department);
-                            Console.WriteLine("(4) Doğum Tarihi: " + updatingBusiness.Birthdate);
-                            Console.WriteLine("(5) Telefon No: " + updatingBusiness.Phone);
-                            Console.WriteLine("(6) Şehir: " + updatingBusiness.City);
-                            Console.WriteLine("(7) Ülke: " + updatingBusiness.Country);
-                            while (true)
+                            if (updatingBusiness != null)
                             {
-                                Console.Write("\n");
-                                Console.Write("Güncellemek istenen bilgiyi seçiniz (Çıkmak için [E]): ");
-                                string item = Console.ReadLine();
-                                if (item.ToUpper() != "E")
+                                Console.WriteLine("Güncellenmek istenen müşteri bilgileri");
+                                Console.WriteLine("--------------------------------------");
+                                Console.WriteLine("    Id: " + updatingBusiness.Id);
+                                Console.WriteLine("(1) Ad: " + updatingBusiness.Name);
+                                Console.WriteLine("(2) Soyad: " + updatingBusiness.Surname);
+                                Console.WriteLine("(3) Bölüm: " + updatingBusiness.Department);
+                                Console.WriteLine("(4) Doğum Tarihi: " + updatingBusiness.Birthdate);
+                                Console.WriteLine("(5) Telefon No: " + updatingBusiness.Phone);
+                                Console.WriteLine("(6) Şehir: " + updatingBusiness.City);
+                                Console.WriteLine("(7) Ülke: " + updatingBusiness.Country);
+                                while (true)
                                 {
-                                    if (item != null & item != "")
+                                    Console.Write("\n");
+                                    Console.Write("Güncellemek istenen bilgiyi seçiniz (Çıkmak için [E]): ");
+                                    string item = Console.ReadLine();
+                                    if (item.ToUpper() != "E")
                                     {
-                                        if (Convert.ToInt32(item) >= 1 && Convert.ToInt32(item) < 8)
+                                        if (item != null & item != "")
                                         {
-                                            Console.Write("Yeni değer: ");
-                                            string newValue = Console.ReadLine();
-                                            if (newValue != null & newValue != "")
+                                            if (Convert.ToInt32(item) >= 1 && Convert.ToInt32(item) < 8)
                                             {
-                                                data = new byte[1024];
-                                                data = ASCIIEncoding.Default.GetBytes(item + newValue);
-                                                businessService.UpdateBusinessman(businessId, data);
-                                                Console.WriteLine("Güncelleme işlemi tamamlandı...");
-                                                break;
+                                                Console.Write("Yeni değer: ");
+                                                string newValue = Console.ReadLine();
+                                                if (newValue != null & newValue != "")
+                                                {
+                                                    data = new byte[1024];
+                                                    data = ASCIIEncoding.Default.GetBytes(item + newValue);
+                                                    businessService.UpdateBusinessman(businessId, data);
+                                                    Console.WriteLine("Güncelleme işlemi tamamlandı...");
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
+                                    else
+                                    {
+                                        break;
+                                    }
                                 }
-                                else
-                                {
-                                    break;
-                                }
+                            }
+                            else
+                            {
+                                Console.Write("\n");
+                                Console.WriteLine("Girdiğiniz id numarasında müşteri bulunmamaktadır.");
                             }
                         }
                         break;
@@ -118,8 +134,17 @@ namespace CouchDbApplication
                         string deletedBusinessId = Console.ReadLine();
                         if (deletedBusinessId != null & deletedBusinessId != "")
                         {
-                            businessService.DeleteBusinessman(deletedBusinessId);
-                            Console.WriteLine("Müşteri silme işlemi başarıyla gerçekleştirilmiştir...");
+                            Business deletedBusines = businessService.DeleteBusinessman(deletedBusinessId);
+                            if (deletedBusines != null)
+                            {
+                                Console.WriteLine("Müşteri silme işlemi başarıyla gerçekleştirilmiştir...");
+                            }
+                            else
+                            {
+                                Console.Write("\n");
+                                Console.WriteLine("Girdiğiniz id numarasında müşteri bulunmamaktadır.");
+                            }
+
                         }
                         break;
                     case "4":

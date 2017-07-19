@@ -11,10 +11,28 @@ namespace CouchDbApplication.Entity
 {
     public class BusinessService : BaseDatabaseService, IBaseBusinesService
     {
-        public void DeleteBusinessman(string businessId)
+        public Business DeleteBusinessman(string businessId)
         {
-            Business deletedBusiness = GetById(businessId);
-            Db.DeleteDocument(businessId, deletedBusiness.Rev);
+            try
+            {
+                Business deletedBusiness = GetById(businessId);
+                if (deletedBusiness == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    Db.DeleteDocument(businessId, deletedBusiness.Rev);
+                    return deletedBusiness;
+                }
+                
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            
         }
 
         public void DeleteDatabase()
@@ -66,7 +84,14 @@ namespace CouchDbApplication.Entity
 
         public Business GetById(string Id)
         {
-            return JsonConvert.DeserializeObject<Business>(Db.GetDocument(Id).ToString());
+            try
+            {
+               return JsonConvert.DeserializeObject<Business>(Db.GetDocument(Id).ToString());
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public List<Business> GetAll()

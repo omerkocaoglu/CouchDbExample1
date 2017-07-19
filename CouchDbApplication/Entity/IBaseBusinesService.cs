@@ -10,7 +10,7 @@ namespace CouchDbApplication.Entity
     {
         void InsertBusinessman(Business insertedEntity);
         void UpdateBusinessman(string businessId, byte[] array);
-        void DeleteBusinessman(string businessId);
+        Business DeleteBusinessman(string businessId);
         Business GetById(string Id);
         List<Business> GetAll();
         void DeleteDatabase();
